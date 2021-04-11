@@ -64,7 +64,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> queryAllInterimValues() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table WHERE $columnIsInterim != 10');
+    return await db.rawQuery('SELECT * FROM $table WHERE $columnIsInterim != 0');
   }
 
   Future<int> queryRowCount() async {

@@ -43,24 +43,34 @@ class _InvestmentState extends State<Investments> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return new ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                if (index == 0) return setupChart(snapshot.data);
-                else return buildRow(
-                    Investment(
-                      snapshot.data[index]['_id'],
-                      snapshot.data[index]['timestamp'],
-                      snapshot.data[index]['amount'],
-                      snapshot.data[index]['description'],
-                      snapshot.data[index]['is_interim_value'] == 0
-                          ? false
-                          : true,
-                    ));
-              },
-            );
-          }
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
 
-          return new Container(
+                  Investment investmentItem = Investment(
+                    snapshot.data[index]['_id'],
+                    snapshot.data[index]['timestamp'],
+                    snapshot.data[index]['amount'],
+                    snapshot.data[index]['description'],
+                    snapshot.data[index]['is_interim_value'] == 0
+                        ? false
+                        : true,
+                  );
+
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        setupChart(snapshot.data),
+                        buildRow(investmentItem),
+                      ],
+                    );
+                  } else {
+                    return buildRow(investmentItem);
+                  }
+                },
+              );
+            }
+
+            return new Container(
             alignment: AlignmentDirectional.center,
             child: new CircularProgressIndicator(),
           );
@@ -126,44 +136,6 @@ class _InvestmentState extends State<Investments> {
   String timestampToString(int timestamp) {
     return DateFormat('dd-MM-yyyy').format(DateTime.fromMillisecondsSinceEpoch(timestamp));
   }
-
-  // void showBottomSheet(BuildContext ctx) {
-  //   showModalBottomSheet(
-  //       isScrollControlled: true,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(16.0)
-  //       ),
-  //       elevation: 5,
-  //       context: ctx,
-  //       builder: (ctx) => Padding(
-  //         padding: EdgeInsets.all(15),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             // TextField(
-  //             //   keyboardType: TextInputType.datetime,
-  //             //   decoration: InputDecoration(labelText: 'Date'),
-  //             //   controller: dateController,
-  //             // ),
-  //             TextField(
-  //               keyboardType: TextInputType.number,
-  //               decoration: InputDecoration(labelText: 'Amount'),
-  //               controller: amountController,
-  //             ),
-  //             TextField(
-  //               keyboardType: TextInputType.text,
-  //               decoration: InputDecoration(labelText: 'Description'),
-  //               controller: descriptionController,
-  //             ),
-  //             SizedBox(
-  //               height: 15,
-  //             ),
-  //             ElevatedButton(onPressed: () { saveInputs(); }, child: Text('Submit'))
-  //           ],
-  //         ),
-  //       ));
-  // }
 
   void showBottomSheet() {
     showModalBottomSheet<void>(
