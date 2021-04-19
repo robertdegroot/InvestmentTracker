@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:investment_tracker/investment_history_chart.dart';
 
+import 'custom_date_picker.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -28,16 +30,15 @@ class _InvestmentState extends State<Investments> {
   final dbHelper = DatabaseHelper.instance;
   final _biggerFont = TextStyle(fontSize: 18.0);
 
-  final dateController = new TextEditingController();
   final descriptionController = new TextEditingController();
   final amountController = new TextEditingController();
+
+  int pickedDate = DateTime.now().millisecondsSinceEpoch;
+  bool isTotalValue = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Investment overview"),
-      ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _getAllInvestments(),
         builder: (context, snapshot) {
@@ -134,7 +135,7 @@ class _InvestmentState extends State<Investments> {
   }
 
   String timestampToString(int timestamp) {
-    return DateFormat('dd-MM-yyyy').format(DateTime.fromMillisecondsSinceEpoch(timestamp));
+    return DateFormat('MMMEd').format(DateTime.fromMillisecondsSinceEpoch(timestamp));
   }
 
   void showBottomSheet() {
@@ -146,48 +147,72 @@ class _InvestmentState extends State<Investments> {
             topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0)),
       ),
       builder: (BuildContext context) {
-        return Padding(
-            padding: MediaQuery.of(context).viewInsets,
-            child: Container(
-                margin: EdgeInsets.all(16.0),
-                child: Wrap(
-                  children: <Widget>[
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: 'Amount'),
-                      controller: amountController,
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(labelText: 'Description'),
-                      controller: descriptionController,
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          saveInputs();
-                          Navigator.pop(context);
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: Container(
+                  margin: EdgeInsets.all(16.0),
+                  child: Wrap(
+                    children: <Widget>[
+                      CheckboxListTile(
+                        title: Text("Interim portfolio value"),
+                        value: isTotalValue,
+                        autofocus: false,
+                        selected: isTotalValue,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            isTotalValue = newValue;
+                          });
                         },
-                        child: Text('Submit'))
-                  ],
-                )));
+                      ),
+                      CustomDatePicker(
+                        prefixIcon: Icon(Icons.date_range),
+                        suffixIcon: Icon(Icons.arrow_drop_down),
+                        lastDate: DateTime.now().add(Duration(days: 366)),
+                        firstDate:
+                            DateTime.now().subtract(Duration(days: 1830)),
+                        initialDate: DateTime.now(),
+                        onDateChanged: (selectedDate) {
+                          pickedDate = selectedDate.millisecondsSinceEpoch;
+                        },
+                      ),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(labelText: 'Amount'),
+                        controller: amountController,
+                      ),
+                      TextField(
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(labelText: 'Description'),
+                        controller: descriptionController,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            saveInputs();
+                            Navigator.pop(context);
+                          },
+                          child: Text('Submit'))
+                    ],
+                  )));
+        });
       },
     );
   }
 
   saveInputs() {
-    var date = dateController.text;
     var amount = amountController.text.toString();
     var description = descriptionController.text.toString();
 
     var investment = Investment(
         null,
-        DateTime.now().millisecondsSinceEpoch,
+        pickedDate,
         double.parse(amount),
         description,
-        false
+        isTotalValue
     );
 
     _insert(investment);
