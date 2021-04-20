@@ -113,8 +113,15 @@ class _InvestmentState extends State<Investments> {
   }
 
   Widget buildRow(Investment investment) {
+    Color backgroundColor = Colors.white;
+
+    if (investment.isInterimValue) {
+      backgroundColor = Colors.lightGreen;
+    }
+
     return Card(
       child: ListTile(
+        tileColor: backgroundColor,
         title: Text(
           "${timestampToString(investment.timestamp)} - ${investment.description}",
           style: _biggerFont,
@@ -156,7 +163,7 @@ class _InvestmentState extends State<Investments> {
                   child: Wrap(
                     children: <Widget>[
                       CheckboxListTile(
-                        title: Text("Interim portfolio value"),
+                        title: Text("Portfolio value update"),
                         value: isTotalValue,
                         autofocus: false,
                         selected: isTotalValue,
@@ -166,36 +173,59 @@ class _InvestmentState extends State<Investments> {
                           });
                         },
                       ),
-                      CustomDatePicker(
-                        prefixIcon: Icon(Icons.date_range),
-                        suffixIcon: Icon(Icons.arrow_drop_down),
-                        lastDate: DateTime.now().add(Duration(days: 366)),
-                        firstDate:
-                            DateTime.now().subtract(Duration(days: 1830)),
-                        initialDate: DateTime.now(),
-                        onDateChanged: (selectedDate) {
-                          pickedDate = selectedDate.millisecondsSinceEpoch;
-                        },
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                        child: CustomDatePicker(
+                          prefixIcon: Icon(Icons.date_range),
+                          suffixIcon: Icon(Icons.arrow_drop_down),
+                          lastDate: DateTime.now().add(Duration(days: 366)),
+                          firstDate:
+                              DateTime.now().subtract(Duration(days: 1830)),
+                          initialDate: DateTime.now(),
+                          onDateChanged: (selectedDate) {
+                            pickedDate = selectedDate.millisecondsSinceEpoch;
+                          },
+                        ),
                       ),
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(labelText: 'Amount'),
-                        controller: amountController,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(), hintText: 'Amount'),
+                          controller: amountController,
+                        ),
                       ),
-                      TextField(
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(labelText: 'Description'),
-                        controller: descriptionController,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                        child: TextField(
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Optional description'),
+                          controller: descriptionController,
+                        ),
                       ),
                       SizedBox(
                         height: 15,
                       ),
-                      ElevatedButton(
-                          onPressed: () {
-                            saveInputs();
-                            Navigator.pop(context);
-                          },
-                          child: Text('Submit'))
+                      Center(
+                          child: ElevatedButton(
+                              onPressed: () {
+                                saveInputs();
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                  'Submit',
+                                 style: TextStyle(fontSize: 20),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                shape: new RoundedRectangleBorder(
+                                    borderRadius: new BorderRadius.circular(24)
+                                )
+                              ),
+                          )
+                      ),
                     ],
                   )));
         });
@@ -219,13 +249,9 @@ class _InvestmentState extends State<Investments> {
   }
 
   Future<List<Map<String, dynamic>>> _getAllInvestments() async {
-    return dbHelper.queryAllInvestments();
+    return dbHelper.queryAllRows();
   }
-
-  Future<List<Map<String, dynamic>>> _getAllInterimValues() async {
-    return dbHelper.queryAllInterimValues();
-  }
-
+  
   _insert(Investment investment) async {
     await dbHelper.insert(investment.toMap());
     setState(() {});

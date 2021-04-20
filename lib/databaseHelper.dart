@@ -56,15 +56,9 @@ class DatabaseHelper {
     return await db.insert(table, row);
   }
 
-  Future<List<Map<String, dynamic>>> queryAllInvestments() async {
+  Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table WHERE $columnIsInterim != 1 ORDER BY timestamp DESC');
-  }
-
-
-  Future<List<Map<String, dynamic>>> queryAllInterimValues() async {
-    Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table WHERE $columnIsInterim != 0');
+    return await db.rawQuery('SELECT * FROM $table ORDER BY timestamp DESC');
   }
 
   Future<int> queryRowCount() async {
