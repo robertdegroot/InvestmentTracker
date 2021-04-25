@@ -11,6 +11,9 @@ class InvestmentHistoryChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    charts.RenderSpec<num> renderSpecPrimary = AxisTheme.axisThemeNum();
+    charts.RenderSpec<DateTime> renderSpecDomain = AxisTheme.axisThemeDateTime();
+
     return Container(
       height: 300,
       padding: EdgeInsets.all(8),
@@ -27,10 +30,9 @@ class InvestmentHistoryChart extends StatelessWidget {
                   ),
                 ),
                 new TextSpan(
-                  text: ' vs ',
+                  text: ' - ',
                   style: new TextStyle(
                     fontSize: 14.0,
-                    color: Colors.black,
                   ),
                 ),
                 new TextSpan(
@@ -45,11 +47,22 @@ class InvestmentHistoryChart extends StatelessWidget {
           ),
           Expanded(
             child: (charts.TimeSeriesChart(
-                _createSeries(investmentData, updateData),
-                defaultRenderer: new charts.LineRendererConfig(
-                  includePoints: true,
-                    includeArea: true,),
-                animate: true)),
+              _createSeries(investmentData, updateData),
+              defaultRenderer: new charts.LineRendererConfig(
+                includePoints: true,
+                includeArea: true,
+              ),
+              animate: true,
+              primaryMeasureAxis: charts.NumericAxisSpec(
+                tickProviderSpec: charts.BasicNumericTickProviderSpec(
+                  zeroBound: false,
+                ),
+                renderSpec: renderSpecPrimary,
+              ),
+              domainAxis: charts.DateTimeAxisSpec(
+                renderSpec: renderSpecDomain,
+              ),
+            )),
           )
         ],
       ),
@@ -75,4 +88,28 @@ List<charts.Series<ChartData, DateTime>> _createSeries(
       data: updateData,
     )
   ];
+}
+
+class AxisTheme {
+  static charts.RenderSpec<num> axisThemeNum() {
+    return charts.GridlineRendererSpec(
+      labelStyle: charts.TextStyleSpec(
+        color: charts.MaterialPalette.gray.shade500,
+      ),
+      lineStyle: charts.LineStyleSpec(
+        color: charts.MaterialPalette.gray.shade500,
+      ),
+    );
+  }
+
+  static charts.RenderSpec<DateTime> axisThemeDateTime() {
+    return charts.GridlineRendererSpec(
+      labelStyle: charts.TextStyleSpec(
+        color: charts.MaterialPalette.gray.shade500,
+      ),
+      lineStyle: charts.LineStyleSpec(
+        color: charts.MaterialPalette.transparent,
+      ),
+    );
+  }
 }

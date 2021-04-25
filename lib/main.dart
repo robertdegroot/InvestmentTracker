@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData.dark(),
       title: "Investment Tracker",
       home: Investments(),
     );
@@ -35,6 +36,7 @@ class _InvestmentState extends State<Investments> {
 
   int pickedDate = DateTime.now().millisecondsSinceEpoch;
   bool isTotalValue = false;
+  double previousUpdate = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +80,7 @@ class _InvestmentState extends State<Investments> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amberAccent,
         child: Icon(Icons.add),
         onPressed: () => showBottomSheet(),
       )
@@ -125,20 +128,56 @@ class _InvestmentState extends State<Investments> {
     });
 
     return new Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16.0)),
+      ),
       child: InvestmentHistoryChart(investmentChartData, updateChartData),
       margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
     );
   }
 
   Widget buildRow(Investment investment) {
-    Color backgroundColor = Colors.white;
+    Color backgroundColor = Colors.black12;
+
+    //TODO color coding not always correct
+    Icon leadingIcon = Icon(Icons.trending_neutral);
 
     if (investment.isInterimValue) {
       backgroundColor = Colors.blueGrey;
+
+      if (previousUpdate != 0) {
+        if (investment.amount > previousUpdate) {
+          backgroundColor = Colors.green;
+          leadingIcon = Icon(Icons.trending_up);
+        } else if (investment.amount < previousUpdate) {
+          backgroundColor = Colors.deepOrangeAccent;
+          leadingIcon = Icon(Icons.trending_down);
+        }
+      }
+
+      previousUpdate = investment.amount;
+    } else {
+      if (investment.amount.isNegative) {
+        leadingIcon = Icon(Icons.remove);
+      } else {
+        leadingIcon = Icon(Icons.add);
+      }
     }
 
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16.0)),
+      ),
       child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
+        ),
+        leading: new Column(
+          children: <Widget>[
+            new IconButton(
+                icon: leadingIcon,
+            )],
+        ),
         tileColor: backgroundColor,
         title: Text(
           "${timestampToString(investment.timestamp)} - ${investment.description}",
@@ -181,6 +220,8 @@ class _InvestmentState extends State<Investments> {
                   child: Wrap(
                     children: <Widget>[
                       CheckboxListTile(
+                        activeColor: Colors.amberAccent,
+                        checkColor: Colors.black,
                         title: Text("Portfolio value update"),
                         value: isTotalValue,
                         autofocus: false,
@@ -238,14 +279,19 @@ class _InvestmentState extends State<Investments> {
                               },
                               child: Text(
                                   'Submit',
-                                 style: TextStyle(fontSize: 20),
+                                  style: TextStyle(
+                                     fontSize: 20, color: Colors.black
+                                  ),
                               ),
                               style: ElevatedButton.styleFrom(
                                 shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(24)
-                                )
+                                    borderRadius: new BorderRadius.circular(16.0)
+                                ),
+                                padding: EdgeInsets.only(left: 16.0, top: 8.0, right: 16.0, bottom: 8.0),
+                                primary: Colors.amberAccent,
+                                onPrimary: Colors.black,
                               ),
-                          )
+                          ),
                       ),
                     ],
                   )));
