@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:investment_tracker/chart_data.dart';
 import 'package:investment_tracker/databaseHelper.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:investment_tracker/investment_history_chart.dart';
-
+import 'package:dotted_border/dotted_border.dart';
 import 'custom_date_picker.dart';
 import 'investment.dart';
 
@@ -62,7 +64,7 @@ class _InvestmentState extends State<Investments> {
                   if (index == 0) {
                     return Column(
                       children: [
-                        setupChart(snapshot.data),
+                        _setupChart(snapshot.data),
                         buildRow(investmentItem),
                       ],
                     );
@@ -71,7 +73,30 @@ class _InvestmentState extends State<Investments> {
                   }
                 },
               );
-            }
+            } else {
+            return new ListView.builder(
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                if (index == 0 ) {
+                  return Column(
+                    children: [
+                      _exampleChart(),
+                    ]
+                  );
+                } else if (index == 1){
+                  return _tipCard(
+                      "Log your first investment!",
+                      "Keep track of all your investments by logging them in the app. You can also add investments to a past date."
+                  );
+                } else {
+                  return _tipCard(
+                      "Keep your portfolio total up to date!",
+                      "Updating your total portfolio regularly will give you the best overview."
+                  );
+                }
+              }
+            );
+          }
 
             return new Container(
             alignment: AlignmentDirectional.center,
@@ -88,7 +113,7 @@ class _InvestmentState extends State<Investments> {
 
   }
 
-  Widget setupChart(List<Map<String, dynamic>> inputData) {
+  Widget _setupChart(List<Map<String, dynamic>> inputData) {
     final List<ChartData> investmentChartData = [];
     final List<ChartData> updateChartData = [];
 
@@ -131,7 +156,65 @@ class _InvestmentState extends State<Investments> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16.0)),
       ),
-      child: InvestmentHistoryChart(investmentChartData, updateChartData),
+      child: InvestmentHistoryChart(investmentChartData, updateChartData, false),
+      margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
+    );
+  }
+
+  Widget _exampleChart() {
+    final List<ChartData> investmentChartData = [];
+    final List<ChartData> updateChartData = [];
+
+    var list = new List<int>.generate(20, (i) => i + 1);
+    var today = DateTime.now();
+
+    Map investmentData = Map<DateTime, double>();
+    Map updateData = Map<DateTime, double>();
+
+    double totalInvestment = 0;
+    double totalPortfolio = 0;
+
+    list.reversed.forEach((iteration) {
+      Random randomValue = new Random();
+      final DateTime timestamp = new DateTime(today.year, today.month - iteration, today.day);
+      final addValue = (randomValue.nextInt(1250 + 250) - 250);
+
+      totalInvestment += addValue.toDouble();
+      totalPortfolio = totalPortfolio + addValue.toDouble() + (randomValue.nextInt(850 + 750) - 750);
+
+      investmentData[timestamp] = totalInvestment;
+      updateData[timestamp] = totalPortfolio;
+    });
+
+    investmentData.forEach((timestamp, amount) {
+      investmentChartData.add(ChartData(
+          timestamp,
+          amount,
+          [2, 2],
+          2.0
+      ));
+    });
+
+    updateData.forEach((timestamp, amount) {
+      updateChartData.add(ChartData(
+          timestamp,
+          amount,
+          [1, 3],
+          3.0
+      ));
+    });
+
+    return new Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16.0)),
+      ),
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        radius: Radius.circular(16.0),
+        color: Colors.white54,
+        dashPattern: [6, 5],
+        child: InvestmentHistoryChart(investmentChartData, updateChartData, true),
+      ),
       margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
     );
   }
@@ -154,13 +237,28 @@ class _InvestmentState extends State<Investments> {
           leadingIcon = Icon(Icons.trending_down);
         }
       }
-
       previousUpdate = investment.amount;
     } else {
       if (investment.amount.isNegative) {
         leadingIcon = Icon(Icons.remove);
       } else {
         leadingIcon = Icon(Icons.add);
+      }
+    }
+
+    var cardTitle = "";
+
+    if (investment.isInterimValue) {
+      if (investment.description.isNotEmpty) {
+        cardTitle += "${timestampToString(investment.timestamp)} - ${investment.description}";
+      } else {
+        cardTitle = "Portfolio on ${timestampToString(investment.timestamp)}";
+      }
+    } else {
+      cardTitle = "${timestampToString(investment.timestamp)}";
+
+      if (investment.description.isNotEmpty) {
+        cardTitle += " - ${investment.description}";
       }
     }
 
@@ -180,7 +278,7 @@ class _InvestmentState extends State<Investments> {
         ),
         tileColor: backgroundColor,
         title: Text(
-          "${timestampToString(investment.timestamp)} - ${investment.description}",
+          cardTitle,
           style: _biggerFont,
         ),
         subtitle: Text(
@@ -199,7 +297,7 @@ class _InvestmentState extends State<Investments> {
   }
 
   String timestampToString(int timestamp) {
-    return DateFormat('MMMEd').format(DateTime.fromMillisecondsSinceEpoch(timestamp));
+    return DateFormat('MMMd').format(DateTime.fromMillisecondsSinceEpoch(timestamp));
   }
 
   void showBottomSheet() {
@@ -297,6 +395,46 @@ class _InvestmentState extends State<Investments> {
                   )));
         });
       },
+    );
+  }
+
+  Widget _tipCard(String titleText, String subtitleText) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(16.0)),
+      ),
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        radius: Radius.circular(16.0),
+        color: Colors.white54,
+        dashPattern: [6, 5],
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0)),
+          ),
+          leading: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.chat_bubble_outline, color: Colors.white54)
+            ],
+          ),
+          tileColor: Colors.black12,
+          title: Padding(
+            padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
+            child: Text(
+              titleText,
+              style: _biggerFont,
+            ),
+          ),
+          subtitle: Padding(
+            padding: EdgeInsets.only(bottom: 8.0, right: 8.0),
+            child: Text(
+              subtitleText,
+            ),
+          ),
+        ),
+      ),
+      margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
     );
   }
 

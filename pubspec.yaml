@@ -32,6 +32,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   english_words: ^4.0.0
   charts_flutter: ^0.10.0
+  dotted_border: ^1.0.6
 
 dev_dependencies:
   flutter_test:

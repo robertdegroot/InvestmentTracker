@@ -6,45 +6,27 @@ import 'package:charts_flutter/flutter.dart' as charts;
 class InvestmentHistoryChart extends StatelessWidget {
   final List<ChartData> investmentData;
   final List<ChartData> updateData;
+  final bool isExampleChart;
 
-  InvestmentHistoryChart(this.investmentData, this.updateData);
+  InvestmentHistoryChart(this.investmentData, this.updateData, this.isExampleChart);
 
   @override
   Widget build(BuildContext context) {
     charts.RenderSpec<num> renderSpecPrimary = AxisTheme.axisThemeNum();
     charts.RenderSpec<DateTime> renderSpecDomain = AxisTheme.axisThemeDateTime();
 
+    var chartText = chartTopText();
+
+    if (isExampleChart) {
+      chartText = exampleChartTopText();
+    }
+
     return Container(
       height: 300,
       padding: EdgeInsets.all(8),
       child: Column(
         children: <Widget>[
-          RichText(
-            text: new TextSpan(
-              children: <TextSpan>[
-                new TextSpan(
-                  text: 'Total investment',
-                  style: new TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.deepOrange,
-                  ),
-                ),
-                new TextSpan(
-                  text: ' - ',
-                  style: new TextStyle(
-                    fontSize: 14.0,
-                  ),
-                ),
-                new TextSpan(
-                  text: 'portfolio value',
-                  style: new TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          chartText,
           Expanded(
             child: (charts.TimeSeriesChart(
               _createSeries(investmentData, updateData),
@@ -64,6 +46,51 @@ class InvestmentHistoryChart extends StatelessWidget {
               ),
             )),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget exampleChartTopText() {
+    return RichText(
+      text: new TextSpan(
+        children: <TextSpan>[
+          new TextSpan(
+            text: 'This is an example chart',
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.green,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget chartTopText() {
+    return RichText(
+      text: new TextSpan(
+        children: <TextSpan>[
+          new TextSpan(
+            text: 'Total investment',
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.deepOrange,
+            ),
+          ),
+          new TextSpan(
+            text: ' - ',
+            style: new TextStyle(
+              fontSize: 14.0,
+            ),
+          ),
+          new TextSpan(
+            text: 'portfolio value',
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.green,
+            ),
+          ),
         ],
       ),
     );
