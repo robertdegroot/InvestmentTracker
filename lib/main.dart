@@ -46,7 +46,7 @@ class _InvestmentState extends State<Investments> {
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _getAllInvestments(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data.isNotEmpty) {
             return new ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
@@ -409,6 +409,7 @@ class _InvestmentState extends State<Investments> {
         color: Colors.white54,
         dashPattern: [6, 5],
         child: ListTile(
+          onTap: () { showBottomSheet(); },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16.0)),
           ),
