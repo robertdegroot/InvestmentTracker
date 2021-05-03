@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:investment_tracker/chart_data.dart';
+import 'package:investment_tracker/model/chart_data.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 class InvestmentHistoryChart extends StatelessWidget {
