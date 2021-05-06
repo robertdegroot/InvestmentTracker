@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         theme: ThemeData.dark(),
-        title: "Investment Tracker",
         initialRoute: '/',
         routes: {
           '/': (context) => InvestmentOverview(),

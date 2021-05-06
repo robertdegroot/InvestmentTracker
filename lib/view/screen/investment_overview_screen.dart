@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:investment_tracker/model/database_response.dart';
+import 'package:investment_tracker/model/investment_state.dart';
 import 'package:investment_tracker/model/investment.dart';
 import 'package:investment_tracker/view/widget/add_investment_bottom_sheet.dart';
 import 'package:investment_tracker/view/widget/example_chart_card.dart';
@@ -9,6 +9,7 @@ import 'package:investment_tracker/view/widget/investment_chart_card.dart';
 import 'package:investment_tracker/view/widget/tip_card.dart';
 import 'package:investment_tracker/view_model/investment_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 class InvestmentOverview extends StatefulWidget {
   @override _InvestmentOverviewState createState() => _InvestmentOverviewState();
@@ -33,8 +34,8 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
     );
   }
 
-  Widget getInvestmentWidget(BuildContext context, DatabaseResponse databaseResponse) {
-    switch (databaseResponse.status) {
+  Widget getInvestmentWidget(BuildContext context, InvestmentState investmentState) {
+    switch (investmentState.status) {
       case Status.LOADING:
         return new Container(
           alignment: AlignmentDirectional.center,
@@ -45,7 +46,7 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
           child: Text('Please try again later.'),
         );
       case Status.COMPLETED:
-        return investmentListBuilder(databaseResponse.data);
+        return investmentListBuilder(investmentState.data);
       case Status.INITIAL:
       default:
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,30 +59,27 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
     }
   }
 
-  ListView investmentListBuilder(List<Map<String, dynamic>> investmentList) {
+  ListView investmentListBuilder(List<Investment> investmentList) {
     if (investmentList != null && investmentList.isNotEmpty) {
       return new ListView.builder(
         itemCount: investmentList.length,
         itemBuilder: (context, index) {
-          Investment investmentItem = Investment(
-            investmentList[index]['_id'],
-            investmentList[index]['timestamp'],
-            investmentList[index]['amount'],
-            investmentList[index]['description'],
-            investmentList[index]['is_interim_value'] == 0
-                ? false
-                : true,
-          );
+          Investment investment = investmentList[index];
+          Investment previousUpdate = investmentList
+              .sublist(index + 1, investmentList.length)
+              .firstWhereOrNull((item) =>
+                  item.isInterimValue && item.timestamp < investment.timestamp);
 
           if (index == 0) {
             return Column(
               children: [
                 InvestmentChartCard(investmentList),
-                InvestmentCard(investmentItem),
+                InvestmentCard(investment, previousUpdate),
               ],
             );
           } else {
-            return InvestmentCard(investmentItem);
+            var view = InvestmentCard(investment, previousUpdate);
+            return view;
           }
         },
       );

@@ -7,31 +7,29 @@ import 'package:provider/provider.dart';
 
 class InvestmentCard extends StatelessWidget {
   final Investment investment;
+  final Investment previousInvestment;
 
-  InvestmentCard(this.investment);
+  InvestmentCard(this.investment, this.previousInvestment);
 
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Colors.black12;
     final biggerFont = TextStyle(fontSize: 18.0);
 
-    //TODO build color coding
     Icon leadingIcon = Icon(Icons.trending_neutral);
-    double previousUpdate = 0;
 
     if (investment.isInterimValue) {
       backgroundColor = Colors.blueGrey;
 
-      if (previousUpdate != 0) {
-        if (investment.amount > previousUpdate) {
+      if (previousInvestment != null) {
+        if (investment.amount > previousInvestment.amount) {
           backgroundColor = Colors.green;
           leadingIcon = Icon(Icons.trending_up);
-        } else if (investment.amount < previousUpdate) {
+        } else if (investment.amount < previousInvestment.amount) {
           backgroundColor = Colors.deepOrangeAccent;
           leadingIcon = Icon(Icons.trending_down);
         }
       }
-      previousUpdate = investment.amount;
     } else {
       if (investment.amount.isNegative) {
         leadingIcon = Icon(Icons.remove);
@@ -82,8 +80,7 @@ class InvestmentCard extends StatelessWidget {
           children: <Widget>[
             new IconButton(
                 onPressed: () {
-                  Provider.of<InvestmentViewModel>(context, listen: false)
-                      .deleteInvestment(investment);
+                  Provider.of<InvestmentViewModel>(context, listen: false).deleteInvestment(investment);
                 },
                 icon: new Icon(Icons.delete)),
           ],

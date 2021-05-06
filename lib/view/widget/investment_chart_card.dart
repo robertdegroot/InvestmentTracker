@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:investment_tracker/model/chart_data.dart';
+import 'package:investment_tracker/model/investment.dart';
 import 'investment_history_chart.dart';
 
 class InvestmentChartCard extends StatelessWidget {
-  final List<Map<String, dynamic>> _data;
+  final List<Investment> _data;
 
   InvestmentChartCard(this._data);
 
@@ -17,15 +18,15 @@ class InvestmentChartCard extends StatelessWidget {
 
     double totalInvestment = 0;
 
-    _data.reversed.forEach((element) {
-      DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(element['timestamp']);
+    _data.reversed.forEach((investment) {
+      DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(investment.timestamp);
 
-      if (element['is_interim_value'] == 0) {
-        totalInvestment += element['amount'];
+      if (!investment.isInterimValue) {
+        totalInvestment += investment.amount;
 
         investmentData[timestamp] = totalInvestment;
       } else {
-        portfolioData[timestamp] = element['amount'];
+        portfolioData[timestamp] = investment.amount;
       }
     });
 

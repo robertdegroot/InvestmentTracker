@@ -1,15 +1,15 @@
-class DatabaseResponse<T> {
+class InvestmentState<T> {
   Status status;
   T data;
   String message;
 
-  DatabaseResponse.initial(this.message) : status = Status.INITIAL;
+  InvestmentState.initial(this.message) : status = Status.INITIAL;
 
-  DatabaseResponse.loading(this.message) : status = Status.LOADING;
+  InvestmentState.loading(this.message) : status = Status.LOADING;
 
-  DatabaseResponse.completed(this.data) : status = Status.COMPLETED;
+  InvestmentState.completed(this.data) : status = Status.COMPLETED;
 
-  DatabaseResponse.error(this.message) : status = Status.ERROR;
+  InvestmentState.error(this.message) : status = Status.ERROR;
 
   @override
   String toString() {

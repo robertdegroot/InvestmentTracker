@@ -2,26 +2,27 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:investment_tracker/model/database_helper.dart';
-import 'package:investment_tracker/model/database_response.dart';
+import 'package:investment_tracker/model/investment_state.dart';
 import 'package:investment_tracker/model/investment.dart';
 
 class InvestmentViewModel with ChangeNotifier {
 
   final dbHelper = DatabaseHelper.instance;
 
-  DatabaseResponse _databaseResponse = DatabaseResponse.initial('Empty data');
-  List<Map<String, dynamic>> _investments;
+  InvestmentState _investmentState = InvestmentState.initial('Initial state');
 
-  List<Map<String, dynamic>> get investments {
+  List<Investment> _investments;
+
+  List<Investment> get investments {
     return _investments;
   }
 
-  DatabaseResponse get response {
-    return _databaseResponse;
+  InvestmentState get response {
+    return _investmentState;
   }
 
   Future<void> getAllInvestments() async {
-    _databaseResponse = DatabaseResponse.loading("Loading all investments");
+    _investmentState = InvestmentState.loading("Loading all investments");
     print("LOADING");
     notifyListeners();
 
@@ -29,11 +30,27 @@ class InvestmentViewModel with ChangeNotifier {
     // await Future.delayed(const Duration(milliseconds: 1000));
 
     try {
-      _investments = await dbHelper.queryAllRows();
-      _databaseResponse = DatabaseResponse.completed(_investments);
+      _investments = [];
+
+      var investmentRows = await dbHelper.queryAllRows();
+
+      investmentRows.forEach((element) {
+        _investments.add(Investment(
+            element['_id'],
+            element['timestamp'],
+            element['amount'],
+            element['description'],
+            element['is_interim_value'] == 0
+              ? false
+              : true,
+        ));
+      });
+
+      _investmentState = InvestmentState.completed(_investments);
+
       print("COMPLETED LOADING");
     } catch(exception) {
-      _databaseResponse = DatabaseResponse.error(exception);
+      _investmentState = InvestmentState.error(exception);
       print("ERROR LOADING");
     }
 
@@ -41,40 +58,41 @@ class InvestmentViewModel with ChangeNotifier {
   }
 
   Future<void> deleteInvestment(Investment investment) async {
-    _databaseResponse = DatabaseResponse.loading("Deleting investment");
-    print("DELETING");
+    _investmentState = InvestmentState.loading("Deleting investment");
+    print("DELETING ${investment.amount}");
     notifyListeners();
 
     try {
       await dbHelper.delete(investment.id);
-      _databaseResponse = DatabaseResponse.completed(_investments);
+
+      _investments.remove(investment);
+      _investmentState = InvestmentState.completed(_investments);
       print("COMPLETED DELETING");
     } catch(exception) {
-      _databaseResponse = DatabaseResponse.error(exception);
+      _investmentState = InvestmentState.error(exception);
       print("ERROR DELETING");
     }
 
-    //TODO adjust on the fly
-    getAllInvestments();
     notifyListeners();
   }
 
   Future<void> insertInvestment(Investment investment) async {
-    _databaseResponse = DatabaseResponse.loading("Deleting investment");
+    _investmentState = InvestmentState.loading("Inserting investment");
     print("INSERTING");
     notifyListeners();
 
     try {
       await dbHelper.insert(investment.toMap());
-      _databaseResponse = DatabaseResponse.completed(_investments);
+
+      _investments.add(investment);
+      _investments.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _investmentState = InvestmentState.completed(_investments);
       print("COMPLETED INSERTING");
     } catch(exception) {
-      _databaseResponse = DatabaseResponse.error(exception);
+      _investmentState = InvestmentState.error(exception);
       print("ERROR INSERTING");
     }
 
-    //TODO adjust on the fly
-    getAllInvestments();
     notifyListeners();
   }
 
