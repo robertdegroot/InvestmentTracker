@@ -60,7 +60,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table ORDER BY timestamp DESC');
+    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnTimestamp DESC, $columnIsInterim DESC');
   }
 
   Future<int> queryRowCount() async {

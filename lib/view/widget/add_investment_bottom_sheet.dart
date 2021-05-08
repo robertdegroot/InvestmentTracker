@@ -13,7 +13,7 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
   final descriptionController = new TextEditingController();
   final amountController = new TextEditingController();
 
-  int pickedDate = DateTime.now().millisecondsSinceEpoch;
+  DateTime pickedDate = DateTime.now();
   bool isTotalValue = false;
 
   @override
@@ -49,7 +49,7 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
                           DateTime.now().subtract(Duration(days: 1830)),
                           initialDate: DateTime.now(),
                           onDateChanged: (selectedDate) {
-                            pickedDate = selectedDate.millisecondsSinceEpoch;
+                            pickedDate = selectedDate;
                           },
                         ),
                       ),
@@ -111,7 +111,7 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
 
     var investment = Investment(
         null,
-        pickedDate,
+        DateTime(pickedDate.year, pickedDate.month, pickedDate.day).millisecondsSinceEpoch,
         double.parse(amount),
         description,
         isTotalValue

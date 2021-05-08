@@ -16,12 +16,26 @@ class InvestmentCard extends StatelessWidget {
     Color backgroundColor = Colors.black12;
     final biggerFont = TextStyle(fontSize: 18.0);
 
+    String changeString = "";
+
     Icon leadingIcon = Icon(Icons.trending_neutral);
 
+    //TODO extract to update_card and expand with more information
     if (investment.isInterimValue) {
       backgroundColor = Colors.blueGrey;
 
       if (previousInvestment != null) {
+        var difference = ((investment.amount - previousInvestment.amount) / previousInvestment.amount) * 100;
+
+        String changeSuffix = "% increase";
+        if (difference.isNegative) {
+          difference *= -1;
+          changeSuffix = "% decrease";
+        }
+
+        var differenceRounded = difference.roundToDouble() % 1 == 0 ? difference.toInt() : difference;
+        changeString = "${differenceRounded.toString()}$changeSuffix";
+
         if (investment.amount > previousInvestment.amount) {
           backgroundColor = Colors.green;
           leadingIcon = Icon(Icons.trending_up);
@@ -39,7 +53,6 @@ class InvestmentCard extends StatelessWidget {
     }
 
     var cardTitle = "";
-
     if (investment.isInterimValue) {
       if (investment.description.isNotEmpty) {
         cardTitle += "${timestampToString(investment.timestamp)} - ${investment.description}";
@@ -53,6 +66,9 @@ class InvestmentCard extends StatelessWidget {
         cardTitle += " - ${investment.description}";
       }
     }
+
+    var cardSubtitle = investment.amount.toString();
+    if (changeString.isNotEmpty) cardSubtitle += " - $changeString";
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -74,7 +90,7 @@ class InvestmentCard extends StatelessWidget {
           style: biggerFont,
         ),
         subtitle: Text(
-          investment.amount.toString(),
+          cardSubtitle,
         ),
         trailing: new Column(
           children: <Widget>[

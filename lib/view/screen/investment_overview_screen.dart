@@ -65,20 +65,40 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
         itemCount: investmentList.length,
         itemBuilder: (context, index) {
           Investment investment = investmentList[index];
-          Investment previousUpdate = investmentList
-              .sublist(index + 1, investmentList.length)
-              .firstWhereOrNull((item) =>
-                  item.isInterimValue && item.timestamp < investment.timestamp);
+          Investment previousUpdate;
+          Investment comparisonUpdate;
+
+          if (investment.isInterimValue) {
+            previousUpdate = investmentList
+                .sublist(index + 1, investmentList.length)
+                .firstWhereOrNull((item) =>
+            item.isInterimValue && item.timestamp < investment.timestamp);
+
+            if (previousUpdate != null) {
+              double investedInBetween = 0;
+
+              investmentList
+                  .sublist(index + 1, investmentList.indexOf(previousUpdate))
+                  .forEach((item) { investedInBetween += item.amount; });
+
+              comparisonUpdate = Investment(
+                  -1,
+                  -1,
+                  previousUpdate.amount + investedInBetween,
+                  "",
+                  true);
+            }
+          }
 
           if (index == 0) {
             return Column(
               children: [
                 InvestmentChartCard(investmentList),
-                InvestmentCard(investment, previousUpdate),
+                InvestmentCard(investment, comparisonUpdate),
               ],
             );
           } else {
-            var view = InvestmentCard(investment, previousUpdate);
+            var view = InvestmentCard(investment, comparisonUpdate);
             return view;
           }
         },

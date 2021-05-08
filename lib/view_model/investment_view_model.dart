@@ -85,7 +85,17 @@ class InvestmentViewModel with ChangeNotifier {
       await dbHelper.insert(investment.toMap());
 
       _investments.add(investment);
-      _investments.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+      _investments.sort((a, b) {
+        int compare = b.timestamp.compareTo(a.timestamp);
+
+        if (compare == 0) {
+          return b.isInterimValue ? 1 : 0;
+        } else {
+          return compare;
+        }
+      });
+
       _investmentState = InvestmentState.completed(_investments);
       print("COMPLETED INSERTING");
     } catch(exception) {
