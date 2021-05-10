@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:investment_tracker/model/chart_data.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:investment_tracker/model/investment/investment_chart_data.dart';
 
 class InvestmentHistoryChart extends StatelessWidget {
-  final List<ChartData> investmentData;
-  final List<ChartData> updateData;
+  final List<InvestmentChartData> investmentData;
+  final List<InvestmentChartData> updateData;
   final bool isExampleChart;
 
   InvestmentHistoryChart(this.investmentData, this.updateData, this.isExampleChart);
@@ -97,21 +97,21 @@ class InvestmentHistoryChart extends StatelessWidget {
   }
 }
 
-List<charts.Series<ChartData, DateTime>> _createSeries(
-    List<ChartData> investmentData, List<ChartData> updateData) {
+List<charts.Series<InvestmentChartData, DateTime>> _createSeries(
+    List<InvestmentChartData> investmentData, List<InvestmentChartData> updateData) {
   return [
-    new charts.Series<ChartData, DateTime>(
+    new charts.Series<InvestmentChartData, DateTime>(
       id: 'Investments',
       colorFn: (_, __) => charts.MaterialPalette.deepOrange.shadeDefault,
-      domainFn: (ChartData investment, _) => investment.timestamp,
-      measureFn: (ChartData investment, _) => investment.price,
+      domainFn: (InvestmentChartData investment, _) => investment.timestamp,
+      measureFn: (InvestmentChartData investment, _) => investment.price,
       data: investmentData,
     ),
-    new charts.Series<ChartData, DateTime>(
+    new charts.Series<InvestmentChartData, DateTime>(
       id: 'Updates',
       colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-      domainFn: (ChartData update, _) => update.timestamp,
-      measureFn: (ChartData update, _) => update.price,
+      domainFn: (InvestmentChartData update, _) => update.timestamp,
+      measureFn: (InvestmentChartData update, _) => update.price,
       data: updateData,
     )
   ];

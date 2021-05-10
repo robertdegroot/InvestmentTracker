@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:investment_tracker/model/chart_data.dart';
-import 'package:investment_tracker/model/investment.dart';
+import 'package:investment_tracker/model/investment/investment.dart';
+import 'package:investment_tracker/model/investment/investment_chart_data.dart';
 import 'investment_history_chart.dart';
 
 class InvestmentChartCard extends StatelessWidget {
@@ -10,8 +10,8 @@ class InvestmentChartCard extends StatelessWidget {
   InvestmentChartCard(this._data);
 
   Widget build(BuildContext context) {
-    final List<ChartData> investmentChartDataPoints = [];
-    final List<ChartData> portfolioChartDataPoints = [];
+    final List<InvestmentChartData> investmentChartDataPoints = [];
+    final List<InvestmentChartData> portfolioChartDataPoints = [];
 
     Map investmentData = Map<DateTime, double>();
     Map portfolioData = Map<DateTime, double>();
@@ -31,7 +31,7 @@ class InvestmentChartCard extends StatelessWidget {
     });
 
     investmentData.forEach((timestamp, amount) {
-      investmentChartDataPoints.add(ChartData(
+      investmentChartDataPoints.add(InvestmentChartData(
           timestamp,
           amount,
           [2, 2],
@@ -40,7 +40,7 @@ class InvestmentChartCard extends StatelessWidget {
     });
 
     portfolioData.forEach((timestamp, amount) {
-      portfolioChartDataPoints.add(ChartData(
+      portfolioChartDataPoints.add(InvestmentChartData(
           timestamp,
           amount,
           [1, 3],

@@ -1,27 +1,26 @@
 import 'dart:io';
 
-import 'package:investment_tracker/main.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'investment.dart';
+import 'expense.dart';
 
-class DatabaseHelper {
+class ExpenseDatabaseHelper {
 
-  static final _databaseName = "InvestmentDatabase.db";
+  static final _databaseName = "ExpenseDatabase.db";
   static final _databaseVersion = 1;
 
-  static final table = 'input_table';
+  static final table = 'expense_table';
 
   static final columnId = '_id';
   static final columnTimestamp = 'timestamp';
   static final columnAmount = 'amount';
-  static final columnDescription = 'description';
-  static final columnIsInterim = 'is_interim_value';
+  static final columnCategory = 'category';
+  static final columnNote = 'note';
 
-  DatabaseHelper._privateConstructor();
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+  ExpenseDatabaseHelper._privateConstructor();
+  static final ExpenseDatabaseHelper instance = ExpenseDatabaseHelper._privateConstructor();
   static Database _database;
 
   Future<Database> get database async {
@@ -47,8 +46,8 @@ class DatabaseHelper {
             $columnId INTEGER PRIMARY KEY,
             $columnTimestamp INTEGER NOT NULL,
             $columnAmount REAL NOT NULL,
-            $columnDescription TEXT,
-            $columnIsInterim INTEGER NOT NULL
+            $columnCategory TEXT NOT NULL,
+            $columnNote TEXT
           )
           ''');
   }
@@ -60,7 +59,7 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnTimestamp DESC, $columnIsInterim DESC');
+    return await db.rawQuery('SELECT * FROM $table ORDER BY $columnTimestamp DESC');
   }
 
   Future<int> queryRowCount() async {
@@ -68,7 +67,7 @@ class DatabaseHelper {
     return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
   }
 
-  Future<int> update(Map<String, Investment> row) async {
+  Future<int> update(Map<String, Expense> row) async {
     Database db = await instance.database;
     int id = row[columnId].id;
     return await db.update(table, row, where: '$columnId = ?', whereArgs: [id]);

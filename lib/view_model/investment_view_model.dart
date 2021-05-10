@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:investment_tracker/model/database_helper.dart';
-import 'package:investment_tracker/model/investment_state.dart';
-import 'package:investment_tracker/model/investment.dart';
+import 'package:investment_tracker/model/investment/investment_database_helper.dart';
+import 'package:investment_tracker/model/investment/investment_state.dart';
+import 'package:investment_tracker/model/investment/investment.dart';
 
 class InvestmentViewModel with ChangeNotifier {
 
-  final dbHelper = DatabaseHelper.instance;
+  final dbHelper = InvestmentDatabaseHelper.instance;
 
-  InvestmentState _investmentState = InvestmentState.initial('Initial state');
+  InvestmentState _investmentState = InvestmentState.initial('Initial investment state');
 
   List<Investment> _investments;
 

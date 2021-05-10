@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:investment_tracker/model/investment_state.dart';
-import 'package:investment_tracker/model/investment.dart';
+import 'package:investment_tracker/model/investment/investment_state.dart';
+import 'package:investment_tracker/model/investment/investment.dart';
 import 'package:investment_tracker/view/widget/add_investment_bottom_sheet.dart';
-import 'package:investment_tracker/view/widget/example_chart_card.dart';
+import 'package:investment_tracker/view/widget/example_investment_chart_card.dart';
 import 'package:investment_tracker/view/widget/investment_card.dart';
 import 'package:investment_tracker/view/widget/investment_chart_card.dart';
 import 'package:investment_tracker/view/widget/tip_card.dart';
@@ -110,7 +110,7 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
             if (index == 0 ) {
               return Column(
                   children: [
-                    ExampleChartCard(),
+                    ExampleInvestmentChartCard(),
                   ]
               );
             } else if (index == 1){

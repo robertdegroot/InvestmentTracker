@@ -3,17 +3,17 @@ import 'dart:math';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:investment_tracker/model/chart_data.dart';
+import 'package:investment_tracker/model/investment/investment_chart_data.dart';
 import 'investment_history_chart.dart';
 
-class ExampleChartCard extends StatelessWidget {
+class ExampleInvestmentChartCard extends StatelessWidget {
 
-  ExampleChartCard();
+  ExampleInvestmentChartCard();
 
   @override
   Widget build(BuildContext context) {
-    final List<ChartData> _investmentChartData = [];
-    final List<ChartData> _updateChartData = [];
+    final List<InvestmentChartData> _investmentChartData = [];
+    final List<InvestmentChartData> _updateChartData = [];
 
     var _list = new List<int>.generate(20, (i) => i + 1);
     var _today = DateTime.now();
@@ -37,7 +37,7 @@ class ExampleChartCard extends StatelessWidget {
     });
 
     _investmentData.forEach((timestamp, amount) {
-      _investmentChartData.add(ChartData(
+      _investmentChartData.add(InvestmentChartData(
           timestamp,
           amount,
           [2, 2],
@@ -46,7 +46,7 @@ class ExampleChartCard extends StatelessWidget {
     });
 
     _updateData.forEach((timestamp, amount) {
-      _updateChartData.add(ChartData(
+      _updateChartData.add(InvestmentChartData(
           timestamp,
           amount,
           [1, 3],

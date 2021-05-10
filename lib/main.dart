@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:investment_tracker/view/screen/investment_overview_screen.dart';
+import 'package:investment_tracker/view/screen/expense_overview.dart';
+import 'package:investment_tracker/view/screen/investment_overview.dart';
+import 'package:investment_tracker/view_model/expense_view_model.dart';
 import 'package:investment_tracker/view_model/investment_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: InvestmentViewModel()),
+        ChangeNotifierProvider.value(value: ExpenseViewModel()),
       ],
       child: MaterialApp(
         theme: ThemeData.dark(),
@@ -30,13 +33,9 @@ class TabLayoutWidget extends StatefulWidget {
 
 class _TabLayoutWidgetState extends State<TabLayoutWidget> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
   static List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Expenses',
-      style: optionStyle,
-    ),
+    ExpenseOverview(),
     InvestmentOverview(),
   ];
 

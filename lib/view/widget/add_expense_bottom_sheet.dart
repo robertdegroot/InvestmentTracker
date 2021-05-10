@@ -1,20 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:investment_tracker/model/investment/investment.dart';
+import 'package:investment_tracker/model/expense/expense.dart';
+import 'package:investment_tracker/view_model/expense_view_model.dart';
 import 'package:provider/provider.dart';
 import 'custom_date_picker.dart';
-import 'package:investment_tracker/view_model/investment_view_model.dart';
 
-class AddInvestmentBottomSheet extends StatefulWidget {
-  @override _AddInvestmentBottomSheetState createState() => _AddInvestmentBottomSheetState();
+class AddExpenseBottomSheet extends StatefulWidget {
+  @override _AddExpenseBottomSheetState createState() => _AddExpenseBottomSheetState();
 }
 
-class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
-  final descriptionController = new TextEditingController();
+class _AddExpenseBottomSheetState extends State<AddExpenseBottomSheet> {
+  final noteController = new TextEditingController();
   final amountController = new TextEditingController();
+  final categoryController = new TextEditingController();
 
   DateTime pickedDate = DateTime.now();
-  bool isTotalValue = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,19 +26,6 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
                   margin: EdgeInsets.all(16.0),
                   child: Wrap(
                     children: <Widget>[
-                      CheckboxListTile(
-                        activeColor: Colors.amberAccent,
-                        checkColor: Colors.black,
-                        title: Text("Portfolio value update"),
-                        value: isTotalValue,
-                        autofocus: false,
-                        selected: isTotalValue,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            isTotalValue = newValue;
-                          });
-                        },
-                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
                         child: CustomDatePicker(
@@ -68,8 +55,18 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Optional description'),
-                          controller: descriptionController,
+                              hintText: 'Category'),
+                          controller: categoryController,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                        child: TextField(
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Optional note'),
+                          controller: noteController,
                         ),
                       ),
                       SizedBox(
@@ -79,9 +76,9 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
                         child: ElevatedButton(
                           onPressed: () {
                             saveInput(context);
-                            isTotalValue = false;
                             amountController.text = "";
-                            descriptionController.text = "";
+                            categoryController.text = "";
+                            noteController.text = "";
                             Navigator.pop(context);
                           },
                           child: Text(
@@ -107,17 +104,18 @@ class _AddInvestmentBottomSheetState extends State<AddInvestmentBottomSheet> {
 
   saveInput(BuildContext context) {
     var amount = amountController.text.toString();
-    var description = descriptionController.text.toString();
+    var note = noteController.text.toString();
+    var category = categoryController.text.toString();
 
-    var investment = Investment(
+    var expense = Expense(
         null,
         DateTime(pickedDate.year, pickedDate.month, pickedDate.day).millisecondsSinceEpoch,
         double.parse(amount),
-        description,
-        isTotalValue
+        category,
+        note
     );
 
-    Provider.of<InvestmentViewModel>(context, listen: false).insertInvestment(investment);
+    Provider.of<ExpenseViewModel>(context, listen: false).insertExpense(expense);
   }
 
 }
