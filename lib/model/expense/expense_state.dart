@@ -7,7 +7,9 @@ class ExpenseState<T> {
 
   ExpenseState.loading(this.message) : status = Status.LOADING;
 
-  ExpenseState.completed(this.data) : status = Status.COMPLETED;
+  ExpenseState.completed(this.message, this.data) : status = Status.COMPLETED;
+
+  ExpenseState.empty(this.message, this.data) : status = Status.EMPTY;
 
   ExpenseState.error(this.message) : status = Status.ERROR;
 
@@ -17,4 +19,4 @@ class ExpenseState<T> {
   }
 }
 
-enum Status { INITIAL, LOADING, COMPLETED, ERROR }
+enum Status { INITIAL, LOADING, COMPLETED, EMPTY, ERROR }

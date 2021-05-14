@@ -23,7 +23,6 @@ class ExpenseViewModel with ChangeNotifier {
 
   Future<void> getAllExpenses() async {
     _expenseState = ExpenseState.loading("Loading all expenses");
-    print("LOADING");
     notifyListeners();
 
     // print("Artificial loading time for debugging");
@@ -44,12 +43,13 @@ class ExpenseViewModel with ChangeNotifier {
         ));
       });
 
-      _expenseState = ExpenseState.completed(_expenses);
-
-      print("COMPLETED LOADING");
+      if (_expenses.isNotEmpty) {
+        _expenseState = ExpenseState.completed("Loaded expenses", _expenses);
+      } else {
+        _expenseState = ExpenseState.empty("No expenses found", _expenses);
+      }
     } catch(exception) {
       _expenseState = ExpenseState.error(exception);
-      print("ERROR LOADING");
     }
 
     notifyListeners();
@@ -57,18 +57,20 @@ class ExpenseViewModel with ChangeNotifier {
 
   Future<void> deleteExpense(Expense expense) async {
     _expenseState = ExpenseState.loading("Deleting expense");
-    print("DELETING ${expense.amount}");
     notifyListeners();
 
     try {
       await dbHelper.delete(expense.id);
 
       _expenses.remove(expense);
-      _expenseState = ExpenseState.completed(_expenses);
-      print("COMPLETED DELETING");
+
+      if (_expenses.isNotEmpty) {
+        _expenseState = ExpenseState.completed("Deleted expenses", _expenses);
+      } else {
+        _expenseState = ExpenseState.empty("No expenses found", _expenses);
+      }
     } catch(exception) {
       _expenseState = ExpenseState.error(exception);
-      print("ERROR DELETING");
     }
 
     notifyListeners();
@@ -76,7 +78,6 @@ class ExpenseViewModel with ChangeNotifier {
 
   Future<void> insertExpense(Expense expense) async {
     _expenseState = ExpenseState.loading("Inserting expense");
-    print("INSERTING");
     notifyListeners();
 
     try {
@@ -86,11 +87,9 @@ class ExpenseViewModel with ChangeNotifier {
 
       _expenses.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
-      _expenseState = ExpenseState.completed(_expenses);
-      print("COMPLETED INSERTING");
+      _expenseState = ExpenseState.completed("Inserted expense", _expenses);
     } catch(exception) {
       _expenseState = ExpenseState.error(exception.toString());
-      print("ERROR INSERTING: ${exception.toString()}");
     }
 
     notifyListeners();

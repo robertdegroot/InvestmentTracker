@@ -7,7 +7,9 @@ class InvestmentState<T> {
 
   InvestmentState.loading(this.message) : status = Status.LOADING;
 
-  InvestmentState.completed(this.data) : status = Status.COMPLETED;
+  InvestmentState.completed(this.message, this.data) : status = Status.COMPLETED;
+
+  InvestmentState.empty(this.message, this.data) : status = Status.EMPTY;
 
   InvestmentState.error(this.message) : status = Status.ERROR;
 
@@ -17,4 +19,4 @@ class InvestmentState<T> {
   }
 }
 
-enum Status { INITIAL, LOADING, COMPLETED, ERROR }
+enum Status { INITIAL, LOADING, COMPLETED, EMPTY, ERROR }

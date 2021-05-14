@@ -23,7 +23,6 @@ class InvestmentViewModel with ChangeNotifier {
 
   Future<void> getAllInvestments() async {
     _investmentState = InvestmentState.loading("Loading all investments");
-    print("LOADING");
     notifyListeners();
 
     // print("Artificial loading time for debugging");
@@ -46,12 +45,13 @@ class InvestmentViewModel with ChangeNotifier {
         ));
       });
 
-      _investmentState = InvestmentState.completed(_investments);
-
-      print("COMPLETED LOADING");
+      if (_investments.isNotEmpty) {
+        _investmentState = InvestmentState.completed("Loaded investment", _investments);
+      } else {
+        _investmentState = InvestmentState.empty("No investments found", _investments);
+      }
     } catch(exception) {
       _investmentState = InvestmentState.error(exception);
-      print("ERROR LOADING");
     }
 
     notifyListeners();
@@ -59,18 +59,20 @@ class InvestmentViewModel with ChangeNotifier {
 
   Future<void> deleteInvestment(Investment investment) async {
     _investmentState = InvestmentState.loading("Deleting investment");
-    print("DELETING ${investment.amount}");
     notifyListeners();
 
     try {
       await dbHelper.delete(investment.id);
 
       _investments.remove(investment);
-      _investmentState = InvestmentState.completed(_investments);
-      print("COMPLETED DELETING");
+
+      if (_investments.isNotEmpty) {
+        _investmentState = InvestmentState.completed("Deleted investment", _investments);
+      } else {
+        _investmentState = InvestmentState.empty("No investments found", _investments);
+      }
     } catch(exception) {
       _investmentState = InvestmentState.error(exception);
-      print("ERROR DELETING");
     }
 
     notifyListeners();
@@ -78,7 +80,6 @@ class InvestmentViewModel with ChangeNotifier {
 
   Future<void> insertInvestment(Investment investment) async {
     _investmentState = InvestmentState.loading("Inserting investment");
-    print("INSERTING");
     notifyListeners();
 
     try {
@@ -96,11 +97,9 @@ class InvestmentViewModel with ChangeNotifier {
         }
       });
 
-      _investmentState = InvestmentState.completed(_investments);
-      print("COMPLETED INSERTING");
+      _investmentState = InvestmentState.completed("Inserted investment", investments);
     } catch(exception) {
       _investmentState = InvestmentState.error(exception);
-      print("ERROR INSERTING");
     }
 
     notifyListeners();

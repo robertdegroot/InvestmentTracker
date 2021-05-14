@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:investment_tracker/model/expense/expense.dart';
 import 'package:investment_tracker/model/expense/expense_state.dart';
 import 'package:investment_tracker/view/widget/add_expense_bottom_sheet.dart';
+import 'package:investment_tracker/view/widget/example_line_chart_card.dart';
+import 'package:investment_tracker/view/widget/example_pie_chart_card.dart';
 import 'package:investment_tracker/view/widget/tip_card.dart';
 import 'package:investment_tracker/view_model/expense_view_model.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +30,7 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
   }
 
   Widget getExpenseWidget(BuildContext context, ExpenseState expenseState) {
+    print(expenseState.message);
     switch (expenseState.status) {
       case Status.LOADING:
         return new Container(
@@ -40,6 +43,8 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
         );
       case Status.COMPLETED:
         return expenseListBuilder(expenseState.data);
+      case Status.EMPTY:
+        return expenseEmptyState();
       case Status.INITIAL:
       default:
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,7 +58,6 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
   }
 
   ListView expenseListBuilder(List<Expense> expenseList) {
-    if (expenseList != null && expenseList.isNotEmpty) {
       return new ListView.builder(
           itemCount: expenseList.length,
           itemBuilder: (context, index) {
@@ -97,31 +101,32 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
             );
           }
       );
-    } else {
-      return new ListView.builder(
-          itemCount: 2,
-          itemBuilder: (context, index) {
-            // if (index == 0 ) {
-            //   return Column(
-            //       children: [
-            //         ExampleInvestmentChartCard(),
-            //       ]
-            //   );
-            // } else
-              if (index == 0){
-              return TipCard(
-                  "Log your first expense",
-                  "Keeping track of all your expenses will give you the best overview here"
-              );
-            } else {
-              return TipCard(
-                  "Create your own categories",
-                  "The categories are customizable and can be added or removed to your liking"
-              );
-            }
+  }
+
+  ListView expenseEmptyState() {
+    return new ListView.builder(
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          if (index == 0 ) {
+            return Column(
+                children: [
+                  ExamplePieChartCard(),
+                ]
+            );
+          } else
+          if (index == 1){
+            return TipCard(
+                "Log your first expense",
+                "Keeping track of all your expenses will give you the best overview here"
+            );
+          } else {
+            return TipCard(
+                "Create your own categories",
+                "The categories are customizable and can be added or removed to your liking"
+            );
           }
-      );
-    }
+        }
+    );
   }
 
   void showBottomSheet() {

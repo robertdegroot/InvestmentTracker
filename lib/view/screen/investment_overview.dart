@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:investment_tracker/model/investment/investment_state.dart';
 import 'package:investment_tracker/model/investment/investment.dart';
 import 'package:investment_tracker/view/widget/add_investment_bottom_sheet.dart';
-import 'package:investment_tracker/view/widget/example_investment_chart_card.dart';
+import 'package:investment_tracker/view/widget/example_line_chart_card.dart';
 import 'package:investment_tracker/view/widget/investment_card.dart';
 import 'package:investment_tracker/view/widget/investment_chart_card.dart';
 import 'package:investment_tracker/view/widget/tip_card.dart';
@@ -34,7 +34,9 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
     );
   }
 
-  Widget getInvestmentWidget(BuildContext context, InvestmentState investmentState) {
+  Widget getInvestmentWidget(
+      BuildContext context, InvestmentState investmentState) {
+    print(investmentState.message);
     switch (investmentState.status) {
       case Status.LOADING:
         return new Container(
@@ -47,86 +49,87 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
         );
       case Status.COMPLETED:
         return investmentListBuilder(investmentState.data);
+      case Status.EMPTY:
+        return investmentEmptyState();
       case Status.INITIAL:
       default:
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Provider.of<InvestmentViewModel>(context, listen: false).getAllInvestments();
-      });
-      return new Container(
-        alignment: AlignmentDirectional.center,
-        child: new CircularProgressIndicator(),
-      );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Provider.of<InvestmentViewModel>(context, listen: false)
+              .getAllInvestments();
+        });
+        return new Container(
+          alignment: AlignmentDirectional.center,
+          child: new CircularProgressIndicator(),
+        );
     }
   }
 
   ListView investmentListBuilder(List<Investment> investmentList) {
-    if (investmentList != null && investmentList.isNotEmpty) {
-      return new ListView.builder(
-        itemCount: investmentList.length,
-        itemBuilder: (context, index) {
-          Investment investment = investmentList[index];
-          Investment previousUpdate;
-          Investment comparisonUpdate;
+    return new ListView.builder(
+      itemCount: investmentList.length,
+      itemBuilder: (context, index) {
+        Investment investment = investmentList[index];
+        Investment previousUpdate;
+        Investment comparisonUpdate;
 
-          if (investment.isInterimValue) {
-            previousUpdate = investmentList
-                .sublist(index + 1, investmentList.length)
-                .firstWhereOrNull((item) =>
-            item.isInterimValue && item.timestamp < investment.timestamp);
+        if (investment.isInterimValue) {
+          previousUpdate = investmentList
+              .sublist(index + 1, investmentList.length)
+              .firstWhereOrNull((item) =>
+                  item.isInterimValue && item.timestamp < investment.timestamp);
 
-            if (previousUpdate != null) {
-              double investedInBetween = 0;
+          if (previousUpdate != null) {
+            double investedInBetween = 0;
 
-              investmentList
-                  .sublist(index + 1, investmentList.indexOf(previousUpdate))
-                  .forEach((item) { investedInBetween += item.amount; });
+            investmentList
+                .sublist(index + 1, investmentList.indexOf(previousUpdate))
+                .forEach((item) {
+              investedInBetween += item.amount;
+            });
 
-              comparisonUpdate = Investment(
-                  -1,
-                  -1,
-                  previousUpdate.amount + investedInBetween,
-                  "",
-                  true);
-            }
+            comparisonUpdate = Investment(
+                -1, -1, previousUpdate.amount + investedInBetween, "", true);
           }
+        }
 
-          if (index == 0) {
+        if (index == 0) {
+          return Column(
+            children: [
+              InvestmentChartCard(investmentList),
+              InvestmentCard(investment, comparisonUpdate),
+            ],
+          );
+        } else {
+          var view = InvestmentCard(investment, comparisonUpdate);
+          return view;
+        }
+      },
+    );
+  }
+
+  ListView investmentEmptyState() {
+    return new ListView.builder(
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          if (index == 0 ) {
             return Column(
-              children: [
-                InvestmentChartCard(investmentList),
-                InvestmentCard(investment, comparisonUpdate),
-              ],
+                children: [
+                  ExampleInvestmentChartCard(),
+                ]
+            );
+          } else if (index == 1){
+            return TipCard(
+                "Log your first investment!",
+                "Keep track of all your investments by logging them in the app. You can also add investments to a past date."
             );
           } else {
-            var view = InvestmentCard(investment, comparisonUpdate);
-            return view;
+            return TipCard(
+                "Keep your portfolio total up to date!",
+                "Updating your total portfolio regularly will give you the best overview."
+            );
           }
-        },
-      );
-    } else {
-      return new ListView.builder(
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            if (index == 0 ) {
-              return Column(
-                  children: [
-                    ExampleInvestmentChartCard(),
-                  ]
-              );
-            } else if (index == 1){
-              return TipCard(
-                  "Log your first investment!",
-                  "Keep track of all your investments by logging them in the app. You can also add investments to a past date."
-              );
-            } else {
-              return TipCard(
-                  "Keep your portfolio total up to date!",
-                  "Updating your total portfolio regularly will give you the best overview."
-              );
-            }
-          }
-      );
-    }
+        }
+    );
   }
 
   void showBottomSheet() {
