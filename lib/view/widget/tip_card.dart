@@ -2,13 +2,18 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:investment_tracker/view/widget/add_expense_bottom_sheet.dart';
 import 'add_investment_bottom_sheet.dart';
 
+enum BottomSheetType { INVESTMENT, EXPENSE }
+
 class TipCard extends StatelessWidget {
+
   final String title;
   final String subtitle;
+  final BottomSheetType bottomSheetType;
 
-  TipCard(this.title, this.subtitle);
+  TipCard(this.title, this.subtitle, this.bottomSheetType);
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +72,16 @@ class TipCard extends StatelessWidget {
             topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0)),
       ),
       builder: (BuildContext context) {
-        return AddInvestmentBottomSheet();
+        switch (bottomSheetType) {
+          case BottomSheetType.INVESTMENT:
+            return AddInvestmentBottomSheet();
+            break;
+          case BottomSheetType.EXPENSE:
+          default:
+            return AddExpenseBottomSheet();
+            break;
+        }
       },
     );
   }
-
 }

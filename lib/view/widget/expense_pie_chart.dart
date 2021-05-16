@@ -12,7 +12,7 @@ class ExpensePieChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<charts.Series<ExpenseChartData, int>> chartData = [];
+    List<charts.Series<ExpenseChartData, String>> chartData = [];
     var chartText = exampleChartTopText();
 
     // if (isExampleChart) {
@@ -21,18 +21,23 @@ class ExpensePieChart extends StatelessWidget {
     // }
 
     return Container(
-      height: 300,
+      height: 400,
       padding: EdgeInsets.all(8),
       child: Column(
         children: <Widget>[
           chartText,
           Expanded(
-            child: (charts.PieChart(chartData,
-                animate: true,
-                defaultRenderer: new charts.ArcRendererConfig(
-                    arcWidth: 80,
-                    arcRendererDecorators: [new charts.ArcLabelDecorator()]))
-            ),
+            child: (charts.PieChart(
+              chartData,
+              animate: true,
+              defaultRenderer: new charts.ArcRendererConfig(
+                  arcWidth: 120,
+                  arcRendererDecorators: [
+                    new charts.ArcLabelDecorator(
+                      labelPosition: charts.ArcLabelPosition.inside,
+                    )
+                  ]),
+            )),
           )
         ],
       ),
@@ -56,21 +61,25 @@ class ExpensePieChart extends StatelessWidget {
   }
 }
 
-List<charts.Series<ExpenseChartData, int>> _createSampleData() {
+List<charts.Series<ExpenseChartData, String>> _createSampleData() {
   final data = [
-    new ExpenseChartData(1, "Rent", 700),
-    new ExpenseChartData(2, "Groceries", 200),
-    new ExpenseChartData(3, "Phone bill", 50),
-    new ExpenseChartData(4, "Insurance", 175),
+    new ExpenseChartData("Rent", 700),
+    new ExpenseChartData("Groceries", 200),
+    new ExpenseChartData("Phone bill", 50),
+    new ExpenseChartData("Insurance", 175),
   ];
 
   return [
-    new charts.Series<ExpenseChartData, int>(
+    new charts.Series<ExpenseChartData, String>(
       id: 'Expenses',
-      domainFn: (ExpenseChartData expense, _) => expense.id,
+      domainFn: (ExpenseChartData expense, _) => expense.category,
       measureFn: (ExpenseChartData expense, _) => expense.price,
       data: data,
-      labelAccessorFn: (ExpenseChartData row, _) => '${row.category} - ${row.price}',
+      labelAccessorFn: (ExpenseChartData row, _) => '${row.price}\n${row.category}',
+      insideLabelStyleAccessorFn: (ExpenseChartData row, _) => charts.TextStyleSpec(
+          fontSize: 11, // size in Pts.
+          color: charts.MaterialPalette.gray.shade800,
+      ),
     )
   ];
 }

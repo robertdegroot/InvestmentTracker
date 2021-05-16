@@ -120,12 +120,14 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
           } else if (index == 1){
             return TipCard(
                 "Log your first investment!",
-                "Keep track of all your investments by logging them in the app. You can also add investments to a past date."
+                "Keep track of all your investments by logging them in the app. You can also add investments to a past date.",
+                BottomSheetType.INVESTMENT
             );
           } else {
             return TipCard(
                 "Keep your portfolio total up to date!",
-                "Updating your total portfolio regularly will give you the best overview."
+                "Updating your total portfolio regularly will give you the best overview.",
+                BottomSheetType.INVESTMENT
             );
           }
         }

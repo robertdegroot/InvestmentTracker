@@ -117,12 +117,14 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
           if (index == 1){
             return TipCard(
                 "Log your first expense",
-                "Keeping track of all your expenses will give you the best overview here"
+                "Keeping track of all your expenses will give you the best overview here",
+                BottomSheetType.EXPENSE
             );
           } else {
             return TipCard(
                 "Create your own categories",
-                "The categories are customizable and can be added or removed to your liking"
+                "The categories are customizable and can be added or removed to your liking",
+                BottomSheetType.EXPENSE
             );
           }
         }
