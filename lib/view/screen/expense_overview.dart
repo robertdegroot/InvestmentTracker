@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:investment_tracker/model/expense/expense.dart';
 import 'package:investment_tracker/model/expense/expense_state.dart';
 import 'package:investment_tracker/view/widget/add_expense_bottom_sheet.dart';
-import 'package:investment_tracker/view/widget/example_line_chart_card.dart';
 import 'package:investment_tracker/view/widget/example_pie_chart_card.dart';
+import 'package:investment_tracker/view/widget/expense_card.dart';
+import 'package:investment_tracker/view/widget/expense_pie_chart_card.dart';
 import 'package:investment_tracker/view/widget/tip_card.dart';
 import 'package:investment_tracker/view_model/expense_view_model.dart';
 import 'package:provider/provider.dart';
@@ -58,49 +59,20 @@ class _ExpenseOverviewState extends State<ExpenseOverview> {
   }
 
   ListView expenseListBuilder(List<Expense> expenseList) {
-      return new ListView.builder(
-          itemCount: expenseList.length,
-          itemBuilder: (context, index) {
-
-            Expense expense = expenseList[index];
-            final biggerFont = TextStyle(fontSize: 18.0);
-
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16.0)),
-              ),
-              child: ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                ),
-                leading: new Column(
-                  children: <Widget>[
-                    new IconButton(
-                      icon: Icon(Icons.remove),
-                    )],
-                ),
-                tileColor: Colors.black12,
-                title: Text(
-                  expense.category,
-                  style: biggerFont,
-                ),
-                subtitle: Text(
-                  "${expense.amount}",
-                ),
-                trailing: new Column(
-                  children: <Widget>[
-                    new IconButton(
-                        onPressed: () {
-                          Provider.of<ExpenseViewModel>(context, listen: false).deleteExpense(expense);
-                        },
-                        icon: new Icon(Icons.delete)),
-                  ],
-                ),
-              ),
-              margin: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0),
+    return new ListView.builder(
+        itemCount: expenseList.length,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Column(
+              children: [
+                ExpensePieChartCard(expenseList),
+                ExpenseCard(expenseList[index]),
+              ],
             );
+          } else {
+            return ExpenseCard(expenseList[index]);
           }
-      );
+        });
   }
 
   ListView expenseEmptyState() {

@@ -3,22 +3,20 @@ import 'package:flutter/widgets.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:investment_tracker/model/expense/expense.dart';
 import 'package:investment_tracker/model/investment/expense_chart_data.dart';
+import 'package:collection/collection.dart';
 
 class ExpensePieChart extends StatelessWidget {
-  final List<Expense> expenseChartData;
+  final List<Expense> expenseData;
   final bool isExampleChart;
 
-  ExpensePieChart(this.expenseChartData, this.isExampleChart);
+  ExpensePieChart(this.expenseData, this.isExampleChart);
 
   @override
   Widget build(BuildContext context) {
     List<charts.Series<ExpenseChartData, String>> chartData = [];
-    var chartText = exampleChartTopText();
+    var chartText = _exampleChartTopText();
 
-    // if (isExampleChart) {
-      chartText = exampleChartTopText();
-      chartData = _createSampleData();
-    // }
+    chartData = _createSeries();
 
     return Container(
       height: 400,
@@ -44,7 +42,7 @@ class ExpensePieChart extends StatelessWidget {
     );
   }
 
-  Widget exampleChartTopText() {
+  Widget _exampleChartTopText() {
     return RichText(
       text: new TextSpan(
         children: <TextSpan>[
@@ -59,27 +57,35 @@ class ExpensePieChart extends StatelessWidget {
       ),
     );
   }
-}
 
-List<charts.Series<ExpenseChartData, String>> _createSampleData() {
-  final data = [
-    new ExpenseChartData("Rent", 700),
-    new ExpenseChartData("Groceries", 200),
-    new ExpenseChartData("Phone bill", 50),
-    new ExpenseChartData("Insurance", 175),
-  ];
+  List<charts.Series<ExpenseChartData, String>> _createSeries() {
+    List<ExpenseChartData> chartData = [];
 
-  return [
-    new charts.Series<ExpenseChartData, String>(
-      id: 'Expenses',
-      domainFn: (ExpenseChartData expense, _) => expense.category,
-      measureFn: (ExpenseChartData expense, _) => expense.price,
-      data: data,
-      labelAccessorFn: (ExpenseChartData row, _) => '${row.price}\n${row.category}',
-      insideLabelStyleAccessorFn: (ExpenseChartData row, _) => charts.TextStyleSpec(
+    expenseData.forEach((expense) {
+      var expenseWithCategory = chartData.firstWhereOrNull((item) => item.category == expense.category);
+
+      if (expenseWithCategory == null) {
+        chartData.add(new ExpenseChartData(expense.category, expense.amount));
+      } else {
+        expenseWithCategory.amount += expense.amount;
+      }
+
+    });
+
+    return [
+      new charts.Series<ExpenseChartData, String>(
+        id: 'Expenses',
+        domainFn: (ExpenseChartData expense, _) => expense.category,
+        measureFn: (ExpenseChartData expense, _) => expense.amount,
+        data: chartData,
+        labelAccessorFn: (ExpenseChartData row, _) =>
+            '${row.amount}\n${row.category}',
+        insideLabelStyleAccessorFn: (ExpenseChartData row, _) =>
+            charts.TextStyleSpec(
           fontSize: 11, // size in Pts.
           color: charts.MaterialPalette.gray.shade800,
-      ),
-    )
-  ];
+        ),
+      )
+    ];
+  }
 }

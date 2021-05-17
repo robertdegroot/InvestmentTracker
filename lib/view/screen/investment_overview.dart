@@ -100,8 +100,7 @@ class _InvestmentOverviewState extends State<InvestmentOverview> {
             ],
           );
         } else {
-          var view = InvestmentCard(investment, comparisonUpdate);
-          return view;
+          return InvestmentCard(investment, comparisonUpdate);
         }
       },
     );

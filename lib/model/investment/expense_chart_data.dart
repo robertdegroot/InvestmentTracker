@@ -1,8 +1,8 @@
 class ExpenseChartData {
 
   final String category;
-  final double price;
+  double amount;
 
-  ExpenseChartData(this.category, this.price);
+  ExpenseChartData(this.category, this.amount);
 
 }
